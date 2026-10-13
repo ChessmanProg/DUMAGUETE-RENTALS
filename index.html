@@ -307,6 +307,50 @@ function renderPublicMap(list) {
 
   publicMapInstance.invalidateSize();
 }
+  
+function openListingModal(listingId) {
+  var listing = data.find(function(l) {
+    return String(l.id) === String(listingId);
+  });
+
+  if (!listing) {
+    alert("Sorry, this boarding house could not be found.");
+    return;
+  }
+
+  var photos = listing.photo_urls || [];
+
+  var photosHTML = photos.length
+    ? '<div class="modal-photos">' +
+      photos.map(function(url) {
+        return '<img src="' + esc(url) + '" alt="Boarding house photo">';
+      }).join("") +
+      '</div>'
+    : '<p class="small">No photos available yet.</p>';
+
+  document.getElementById("modalContent").innerHTML =
+    '<h2>' + esc(listing.title) + '</h2>' +
+    photosHTML +
+    '<p class="small">📍 ' + esc(listing.area) + ', Dumaguete</p>' +
+    '<h3 class="price">₱' + Number(listing.price).toLocaleString() + ' / month</h3>' +
+    '<p>' + esc(listing.description || "No description provided.") + '</p>' +
+    '<div class="tags">' +
+      (listing.amenities || []).map(function(a) {
+        return '<span class="tag">' + esc(a) + '</span>';
+      }).join("") +
+    '</div>' +
+    '<p>📞 ' + esc(listing.phone || "No contact number provided.") + '</p>';
+
+  document.getElementById("commentsList").innerHTML =
+    '<p class="small">Comments will be added in a later step.</p>';
+
+  document.getElementById("listingModal").style.display = "flex";
+}
+
+function closeListingModal() {
+  document.getElementById("listingModal").style.display = "none";
+}
+
 function render(){
   var max=parseFloat(fPrice.value);
   var list=data.filter(function(l){
