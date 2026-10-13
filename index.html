@@ -36,7 +36,8 @@ form{display:grid;gap:10px;margin-top:12px}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .checks{display:flex;flex-wrap:wrap;gap:12px}
 .checks label{flex-direction:row;align-items:center;color:var(--text);font-size:.9rem}
-</style>
+</style> 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <header>
@@ -67,6 +68,23 @@ form{display:grid;gap:10px;margin-top:12px}
 </form>
 </details>
 
+
+<details>
+<summary>🔐 Owner login</summary>
+<p class="small">Sign in to access owner-only features.</p>
+<form id="loginForm">
+  <label>Email address
+    <input id="ownerEmail" type="email" required placeholder="Your registered email">
+  </label>
+  <label>Password
+    <input id="ownerPassword" type="password" required placeholder="Your password">
+  </label>
+  <button type="submit" id="loginBtn">Sign in</button>
+  <button type="button" id="logoutBtn" hidden>Sign out</button>
+  <p class="small" id="ownerStatus">Not signed in.</p>
+</form>
+</details>
+
 <div id="count" class="small">Loading...</div>
 <div class="grid" id="grid"></div>
 </main>
@@ -75,7 +93,9 @@ form{display:grid;gap:10px;margin-top:12px}
 var SUPABASE_URL = "https://mxyynwhauvelvrluiqxl.supabase.co";
 var SUPABASE_KEY = "sb_publishable_QsAcpivm_nN978UxQKbBQw_92lbwrBG";
 var API = SUPABASE_URL + "/rest/v1/listings";
-var HEAD = {"apikey": SUPABASE_KEY, "Content-Type": "application/json"};
+var HEAD = {"apikey": SUPABASE_KEY, "Content-Type": "application/json"};  
+var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 
 var AMENITIES = ["WiFi","Water included","Electricity included","Aircon","Own CR","Kitchen access"];
 var data = [];
@@ -137,6 +157,95 @@ document.getElementById("form").addEventListener("submit",function(ev){
     .then(function(){ f.reset(); msg.textContent="Posted! Thank you."; load(); })
     .catch(function(e){ msg.textContent="Could not post ("+e.message+"). Please try again."; })
     .then(function(){ btn.disabled=false; });
+});
+
+var loginForm = document.getElementById("loginForm");
+var loginBtn = document.getElementById("loginBtn");
+var logoutBtn = document.getElementById("logoutBtn");
+var ownerStatus = document.getElementById("ownerStatus");
+
+async function showOwnerSession(session) {
+  if (!session || !session.user) {
+    ownerStatus.textContent = "Not signed in.";
+    loginBtn.hidden = false;
+    logoutBtn.hidden = true;
+    document.getElementById("ownerEmail").disabled = false;
+    document.getElementById("ownerPassword").disabled = false;
+    return;
+  }
+
+  loginBtn.hidden = true;
+  logoutBtn.hidden = false;
+  document.getElementById("ownerEmail").disabled = true;
+  document.getElementById("ownerPassword").disabled = true;
+  document.getElementById("ownerPassword").value = "";
+
+  try {
+    var result = await supabaseClient
+      .from("owner_profiles")
+      .select("is_approved")
+      .eq("user_id", session.user.id)
+      .maybeSingle();
+
+    if (result.error) throw result.error;
+
+    if (result.data && result.data.is_approved === true) {
+      ownerStatus.textContent =
+        "Signed in and approved for owner features.";
+    } else {
+      ownerStatus.textContent =
+        "Signed in, but your account is not approved for owner features.";
+    }
+  } catch (error) {
+    ownerStatus.textContent =
+      "Signed in, but approval could not be checked. Please try refreshing.";
+    console.error("Approval check failed:", error);
+  }
+}
+
+loginForm.addEventListener("submit", async function(event) {
+  event.preventDefault();
+  loginBtn.disabled = true;
+  ownerStatus.textContent = "Signing in...";
+
+  try {
+    var result = await supabaseClient.auth.signInWithPassword({
+      email: document.getElementById("ownerEmail").value.trim(),
+      password: document.getElementById("ownerPassword").value
+    });
+
+    if (result.error) throw result.error;
+    await showOwnerSession(result.data.session);
+  } catch (error) {
+    ownerStatus.textContent =
+      "Sign-in failed. Please check your email and password.";
+    console.error("Sign-in failed:", error);
+  } finally {
+    loginBtn.disabled = false;
+  }
+});
+
+logoutBtn.addEventListener("click", async function() {
+  logoutBtn.disabled = true;
+
+  try {
+    var result = await supabaseClient.auth.signOut();
+    if (result.error) throw result.error;
+    await showOwnerSession(null);
+  } catch (error) {
+    ownerStatus.textContent = "Sign-out failed. Please try again.";
+    console.error("Sign-out failed:", error);
+  } finally {
+    logoutBtn.disabled = false;
+  }
+});
+
+supabaseClient.auth.getSession().then(async function(result) {
+  if (result.error) {
+    ownerStatus.textContent = "Could not check your login session.";
+    return;
+  }
+  await showOwnerSession(result.data.session);
 });
 
 load();
