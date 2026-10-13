@@ -362,7 +362,8 @@ function render(){
   document.getElementById("grid").innerHTML=list.map(function(l){
     var tel=String(l.phone||"").replace(/[^0-9+]/g,"");
     
-return '<div class="card"><div class="pic">'+
+
+return '<div class="card" onclick="openListingModal(\''+esc(l.id)+'\')" style="cursor:pointer"><div class="pic">'+
       (l.photo_urls && l.photo_urls.length
         ? '<img src="'+esc(l.photo_urls[0])+'" alt="Photo of '+esc(l.title)+'" style="width:100%;height:180px;object-fit:cover">'
         : '🏠')+
