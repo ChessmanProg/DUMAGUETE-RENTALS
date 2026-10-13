@@ -1,0 +1,131 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#102d8c"/>
+      <stop offset=".5" stop-color="#07164c"/>
+      <stop offset="1" stop-color="#020829"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2=".8" y2="1">
+      <stop offset="0" stop-color="#fff5a0"/>
+      <stop offset=".3" stop-color="#ffc247"/>
+      <stop offset=".7" stop-color="#ff951f"/>
+      <stop offset="1" stop-color="#ffcf43"/>
+    </linearGradient>
+    <linearGradient id="teal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#9efff0"/>
+      <stop offset=".4" stop-color="#00d8c5"/>
+      <stop offset="1" stop-color="#006aab"/>
+    </linearGradient>
+    <linearGradient id="keyGold" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#a5fff1"/>
+      <stop offset=".5" stop-color="#36d9d4"/>
+      <stop offset="1" stop-color="#ffd65b"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="7" result="blur"/>
+      <feOffset dy="8"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope=".45"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- App background -->
+  <rect width="512" height="512" rx="100" fill="url(#bg)"/>
+  <rect x="10" y="10" width="492" height="492" rx="94"
+        fill="none" stroke="#2869ff" stroke-opacity=".5" stroke-width="3"/>
+
+  <!-- Neon circular frame -->
+  <circle cx="256" cy="253" r="185" fill="#061341"
+          stroke="#087aff" stroke-width="4" filter="url(#glow)"/>
+  <circle cx="256" cy="253" r="174" fill="none"
+          stroke="#4acfff" stroke-opacity=".6" stroke-width="2"/>
+
+  <!-- House chimney -->
+  <rect x="160" y="158" width="34" height="82" rx="7"
+        fill="url(#gold)" stroke="#ffe9a0" stroke-width="3"
+        filter="url(#shadow)"/>
+
+  <!-- House body -->
+  <path d="M125 246 L256 137 L387 246 V359
+           Q387 379 367 379 H145 Q125 379 125 359 Z"
+        fill="url(#gold)" stroke="#ffca53" stroke-width="5"
+        stroke-linejoin="round" filter="url(#shadow)"/>
+
+  <!-- Roof -->
+  <path d="M102 244 L252 119 Q258 114 264 120
+           L292 144 L130 280 Q119 288 111 278
+           Q102 269 111 260 L102 244Z"
+        fill="#b95b16" opacity=".65"/>
+  <path d="M92 237 L248 112 Q256 105 264 113
+           L282 128 L119 261 Q108 270 99 258
+           Q90 249 92 237Z"
+        fill="url(#gold)" stroke="#ffdc77" stroke-width="4"
+        stroke-linejoin="round" filter="url(#glow)"/>
+
+  <!-- Door -->
+  <path d="M218 379 V285 Q218 276 228 276 H277
+           Q287 276 287 286 V379Z"
+        fill="#77320c" stroke="#fff1a0" stroke-width="7"
+        stroke-linejoin="round"/>
+  <circle cx="272" cy="330" r="4" fill="#ffca4d"/>
+
+  <!-- Left window -->
+  <rect x="145" y="222" width="47" height="44" rx="6"
+        fill="#ffd768" stroke="#fff1a0" stroke-width="4"/>
+  <path d="M168 224 V264 M147 244 H190"
+        stroke="#ff9d23" stroke-width="4"/>
+
+  <!-- Location pin shadow -->
+  <path d="M322 101 C284 101 261 127 261 160
+           C261 198 322 259 322 259
+           S383 198 383 160 C383 127 360 101 322 101Z"
+        fill="#020923" opacity=".7" transform="translate(5 8)"/>
+
+  <!-- Location pin -->
+  <path d="M322 92 C285 92 263 119 263 152
+           C263 190 322 250 322 250
+           S381 190 381 152 C381 119 359 92 322 92Z"
+        fill="url(#teal)" stroke="#56fff0" stroke-width="4"
+        stroke-linejoin="round" filter="url(#glow)"/>
+  <circle cx="322" cy="151" r="34" fill="#053a66"
+          stroke="#55f7e7" stroke-width="6"/>
+  <circle cx="322" cy="151" r="19" fill="url(#gold)"
+          stroke="#fff0a0" stroke-width="3"/>
+
+  <!-- Key: shaft -->
+  <path d="M238 330 H328"
+        fill="none" stroke="#0b4c69" stroke-width="22"
+        stroke-linecap="round" transform="translate(0 5)"/>
+  <path d="M238 330 H328"
+        fill="none" stroke="url(#keyGold)" stroke-width="16"
+        stroke-linecap="round" filter="url(#glow)"/>
+
+  <!-- Key teeth -->
+  <path d="M250 331 V349 M269 331 V343 M288 331 V349"
+        fill="none" stroke="url(#keyGold)" stroke-width="9"
+        stroke-linecap="round"/>
+
+  <!-- Key head -->
+  <circle cx="344" cy="330" r="32" fill="url(#gold)"
+          stroke="#fff0a0" stroke-width="5" filter="url(#glow)"/>
+  <circle cx="344" cy="330" r="15" fill="#09204d"
+          stroke="#ffca48" stroke-width="3"/>
+
+  <!-- Sparkle -->
+  <path d="M101 124 L107 139 L122 145 L107 151
+           L101 166 L95 151 L80 145 L95 139Z"
+        fill="#fff5bb" filter="url(#glow)"/>
+</svg>
