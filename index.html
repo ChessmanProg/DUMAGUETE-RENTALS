@@ -396,6 +396,173 @@ await refreshPhotoListings();
     console.error("Approval check failed:", error);
   }
 }
+var editLocationMap;
+var editLocationMarker;
+
+async function loadEditLocationListings() {
+  var select = document.getElementById("editLocationListing");
+  var status = document.getElementById("editLocationStatus");
+
+  select.innerHTML = '<option value="">Select a listing</option>';
+
+  if (!currentOwnerId || !currentOwnerApproved) {
+    status.textContent = "Please sign in with an approved owner account.";
+    return;
+  }
+
+  status.textContent = "Loading your listings...";
+
+  var result = await supabaseClient
+    .from("listings")
+    .select("id,title,latitude,longitude")
+    .eq("owner_id", currentOwnerId)
+    .order("created_at", { ascending: false });
+
+  if (result.error) {
+    status.textContent = "Could not load listings. Please refresh.";
+    return;
+  }
+
+  (result.data || []).forEach(function(listing) {
+    var option = document.createElement("option");
+    option.value = listing.id;
+    option.textContent = listing.title;
+    select.appendChild(option);
+  });
+
+  status.textContent = result.data.length
+    ? "Choose a listing, then click the map to place its pin."
+    : "No listings are linked to your owner account yet.";
+}
+
+document.getElementById("editLocationSection").addEventListener("toggle", function() {
+  if (!this.open) return;
+
+  if (!currentOwnerId || !currentOwnerApproved) {
+    document.getElementById("editLocationStatus").textContent =
+      "Please sign in with an approved owner account.";
+    return;
+  }
+
+  if (!editLocationMap) {
+    editLocationMap = L.map("editLocationMap").setView([9.3077, 123.3054], 13);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(editLocationMap);
+
+    editLocationMap.on("click", function(e) {
+      if (!document.getElementById("editLocationListing").value) {
+        document.getElementById("editLocationStatus").textContent =
+          "Please select a listing first.";
+        return;
+      }
+
+      if (editLocationMarker) {
+        editLocationMarker.setLatLng(e.latlng);
+      } else {
+        editLocationMarker = L.marker(e.latlng).addTo(editLocationMap);
+      }
+
+      document.getElementById("editLatitude").value = e.latlng.lat;
+      document.getElementById("editLongitude").value = e.latlng.lng;
+      document.getElementById("editLocationStatus").textContent =
+        "Location selected. Click Save location to confirm.";
+    });
+  }
+
+  loadEditLocationListings();
+
+  setTimeout(function() {
+    editLocationMap.invalidateSize();
+  }, 100);
+});
+
+document.getElementById("editLocationListing").addEventListener("change", function() {
+  var listing = data.find(function(item) {
+    return String(item.id) === this.value;
+  }, this);
+
+  if (!listing) return;
+
+  var lat = Number(listing.latitude);
+  var lng = Number(listing.longitude);
+
+  document.getElementById("editLatitude").value = "";
+  document.getElementById("editLongitude").value = "";
+
+  if (Number.isFinite(lat) && Number.isFinite(lng) &&
+      listing.latitude != null && listing.longitude != null) {
+    editLocationMap.setView([lat, lng], 16);
+
+    if (editLocationMarker) {
+      editLocationMarker.setLatLng([lat, lng]);
+    } else {
+      editLocationMarker = L.marker([lat, lng]).addTo(editLocationMap);
+    }
+  } else {
+    editLocationMap.setView([9.3077, 123.3054], 13);
+
+    if (editLocationMarker) {
+      editLocationMap.removeLayer(editLocationMarker);
+      editLocationMarker = null;
+    }
+  }
+
+  document.getElementById("editLocationStatus").textContent =
+    "Click the map to choose this listing's location.";
+});
+
+document.getElementById("editLocationForm").addEventListener("submit", async function(event) {
+  event.preventDefault();
+
+  var status = document.getElementById("editLocationStatus");
+  var button = document.getElementById("saveLocationBtn");
+  var listingId = document.getElementById("editLocationListing").value;
+  var latitude = document.getElementById("editLatitude").value;
+  var longitude = document.getElementById("editLongitude").value;
+
+  if (!currentOwnerId || !currentOwnerApproved) {
+    status.textContent = "Please sign in with an approved owner account.";
+    return;
+  }
+
+  if (!listingId || latitude === "" || longitude === "") {
+    status.textContent = "Select a listing and click the map first.";
+    return;
+  }
+
+  button.disabled = true;
+  status.textContent = "Saving location...";
+
+  try {
+    var result = await supabaseClient
+      .from("listings")
+      .update({
+        latitude: Number(latitude),
+        longitude: Number(longitude)
+      })
+      .eq("id", listingId)
+      .eq("owner_id", currentOwnerId)
+      .select("id");
+
+    if (result.error) throw result.error;
+
+    if (!result.data || !result.data.length) {
+      throw new Error("No listing was updated. Check listing ownership and database permissions.");
+    }
+
+    status.textContent = "Location saved successfully!";
+    load();
+  } catch (error) {
+    console.error("Location update failed:", error);
+    status.textContent =
+      "Could not save location. Check database permissions, then try again.";
+  } finally {
+    button.disabled = false;
+  }
+});
+
 
 loginForm.addEventListener("submit", async function(event) {
   event.preventDefault();
