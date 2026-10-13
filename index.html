@@ -117,6 +117,7 @@ var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 var AMENITIES = ["WiFi","Water included","Electricity included","Aircon","Own CR","Kitchen access"];
 var data = [];  
 var currentOwnerId = null;
+  var currentOwnerApproved = false;
 
 function esc(s){var d=document.createElement("div");d.textContent=s==null?"":String(s);return d.innerHTML}
 var fArea=document.getElementById("fArea"), fPrice=document.getElementById("fPrice"), fAm=document.getElementById("fAm");
@@ -181,6 +182,38 @@ var loginForm = document.getElementById("loginForm");
 var loginBtn = document.getElementById("loginBtn");
 var logoutBtn = document.getElementById("logoutBtn");
 var ownerStatus = document.getElementById("ownerStatus");
+  async function refreshPhotoListings() {
+  var select = document.getElementById("photoListing");
+  select.innerHTML = '<option value="">Select a listing</option>';
+
+  if (!currentOwnerId || !currentOwnerApproved) {
+    return;
+  }
+
+  var result = await supabaseClient
+    .from("listings")
+    .select("id,title")
+    .eq("owner_id", currentOwnerId)
+    .order("created_at", { ascending: false });
+
+  if (result.error) {
+    document.getElementById("photoStatus").textContent =
+      "Could not load your listings. Please refresh.";
+    return;
+  }
+
+  (result.data || []).forEach(function(listing) {
+    var option = document.createElement("option");
+    option.value = listing.id;
+    option.textContent = listing.title;
+    select.appendChild(option);
+  });
+
+  document.getElementById("photoStatus").textContent =
+    result.data.length
+      ? "Choose your listing and a photo."
+      : "You do not have any listings linked to your account yet.";
+}
 
 async function showOwnerSession(session) {
 currentOwnerId = session && session.user ? session.user.id : null;
