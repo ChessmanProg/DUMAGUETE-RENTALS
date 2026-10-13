@@ -217,12 +217,16 @@ var ownerStatus = document.getElementById("ownerStatus");
 
 async function showOwnerSession(session) {
 currentOwnerId = session && session.user ? session.user.id : null;
+  currentOwnerApproved = false;
   if (!session || !session.user) {
     ownerStatus.textContent = "Not signed in.";
     loginBtn.hidden = false;
     logoutBtn.hidden = true;
     document.getElementById("ownerEmail").disabled = false;
     document.getElementById("ownerPassword").disabled = false;
+    
+    await refreshPhotoListings();
+    
     return;
   }
 
@@ -241,13 +245,17 @@ currentOwnerId = session && session.user ? session.user.id : null;
 
     if (result.error) throw result.error;
 
-    if (result.data && result.data.is_approved === true) {
-      ownerStatus.textContent =
-        "Signed in and approved for owner features.";
-    } else {
-      ownerStatus.textContent =
-        "Signed in, but your account is not approved for owner features.";
-    }
+if (result.data && result.data.is_approved === true) {
+  currentOwnerApproved = true;
+  ownerStatus.textContent =
+    "Signed in and approved for owner features.";
+} else {
+  currentOwnerApproved = false;
+  ownerStatus.textContent =
+    "Signed in, but your account is not approved for owner features.";
+}
+
+await refreshPhotoListings();
   } catch (error) {
     ownerStatus.textContent =
       "Signed in, but approval could not be checked. Please try refreshing.";
