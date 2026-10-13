@@ -133,11 +133,19 @@ body {
     border-color 0.25s ease;
 }
 
+
 .card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 14px 30px rgba(15, 118, 110, 0.14);
+  transform: translateY(-8px);
+  box-shadow: 0 18px 35px rgba(15, 118, 110, 0.22);
   border-color: var(--accent);
 }
+
+@media (hover: hover) and (pointer: fine) {
+  .card:hover {
+    cursor: pointer;
+  }
+}
+
 
 .pic {
   overflow: hidden;
