@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dumaguete Boarding Houses</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--text:#1d2430;--muted:#667085;--accent:#0f766e;--line:#e3e6ea}
+@media (prefers-color-scheme:dark){:root{--bg:#12161c;--card:#1b212b;--text:#eef1f5;--muted:#9aa4b2;--accent:#2dd4bf;--line:#2a323e}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.45}
+header{padding:28px 16px 12px;max-width:960px;margin:auto}
+h1{margin:0 0 4px;font-size:1.6rem}
+header p{margin:0;color:var(--muted)}
+main{max-width:960px;margin:auto;padding:0 16px 40px}
+.bar{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0;align-items:end}
+label{display:flex;flex-direction:column;font-size:.8rem;color:var(--muted);gap:4px}
+select,input,textarea{font:inherit;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--text);max-width:100%}
+button{font:inherit;padding:9px 14px;border:0;border-radius:8px;background:var(--accent);color:#fff;cursor:pointer;font-weight:600}
+button:disabled{opacity:.6}
+button.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.pic{height:110px;display:flex;align-items:center;justify-content:center;font-size:2.6rem;background:linear-gradient(135deg,#99f6e4,#a5b4fc)}
+.body{padding:12px 14px;display:flex;flex-direction:column;gap:6px;flex:1}
+.price{font-weight:700;color:var(--accent);font-size:1.1rem}
+.tags{display:flex;flex-wrap:wrap;gap:4px}
+.tag{font-size:.72rem;border:1px solid var(--line);border-radius:99px;padding:2px 8px;color:var(--muted)}
+.small{font-size:.85rem;color:var(--muted)}
+details{margin:8px 0 18px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+summary{cursor:pointer;font-weight:700}
+form{display:grid;gap:10px;margin-top:12px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.checks{display:flex;flex-wrap:wrap;gap:12px}
+.checks label{flex-direction:row;align-items:center;color:var(--text);font-size:.9rem}
+</style>
+</head>
+<body>
+<header>
+<h1>🏠 Dumaguete Boarding Houses</h1>
+<p>Find a place to stay near schools, work, and the city center.</p>
+</header>
+<main>
+<div class="bar">
+<label>Area<select id="fArea"><option value="">All areas</option></select></label>
+<label>Max price (₱/month)<input id="fPrice" type="number" min="0" step="100" placeholder="e.g. 4000"></label>
+<label>Must include<select id="fAm"><option value="">Anything</option></select></label>
+<button class="ghost" id="reset" type="button">Reset</button>
+</div>
+
+<details>
+<summary>+ Post your boarding house (owners)</summary>
+<form id="form">
+<label>Name of place<input name="title" required maxlength="60" placeholder="e.g. Sunrise Boarding House"></label>
+<div class="row">
+<label>Area<input name="area" required maxlength="40" placeholder="e.g. Daro"></label>
+<label>Price per month (₱)<input name="price" type="number" min="0" required></label>
+</div>
+<label>Description<textarea name="desc" rows="2" maxlength="200"></textarea></label>
+<label>Contact number<input name="phone" required maxlength="20" placeholder="09xx xxx xxxx"></label>
+<div class="checks" id="amChecks"></div>
+<button type="submit" id="submitBtn">Post listing</button>
+<span class="small" id="msg"></span>
+</form>
+</details>
+
+<div id="count" class="small">Loading...</div>
+<div class="grid" id="grid"></div>
+</main>
+
+<script>
+var SUPABASE_URL = "https://mxyynwhauvelvrluiqxl.supabase.co";
+var SUPABASE_KEY = "sb_publishable_QsAcpivm_nN978UxQKbBQw_92lbwrBG";
+var API = SUPABASE_URL + "/rest/v1/listings";
+var HEAD = {"apikey": SUPABASE_KEY, "Content-Type": "application/json"};
+
+var AMENITIES = ["WiFi","Water included","Electricity included","Aircon","Own CR","Kitchen access"];
+var data = [];
+
+function esc(s){var d=document.createElement("div");d.textContent=s==null?"":String(s);return d.innerHTML}
+var fArea=document.getElementById("fArea"), fPrice=document.getElementById("fPrice"), fAm=document.getElementById("fAm");
+
+AMENITIES.forEach(function(a){
+  fAm.insertAdjacentHTML("beforeend","<option>"+a+"</option>");
+  document.getElementById("amChecks").insertAdjacentHTML("beforeend",'<label><input type="checkbox" value="'+a+'"> '+a+"</label>");
+});
+
+function refreshAreas(){
+  var cur=fArea.value, areas=[];
+  data.forEach(function(l){ if(areas.indexOf(l.area)<0) areas.push(l.area); });
+  areas.sort();
+  fArea.innerHTML='<option value="">All areas</option>'+areas.map(function(a){return "<option>"+esc(a)+"</option>"}).join("");
+  fArea.value=cur;
+}
+
+function render(){
+  var max=parseFloat(fPrice.value);
+  var list=data.filter(function(l){
+    var am=l.amenities||[];
+    return (!fArea.value||l.area===fArea.value)&&(isNaN(max)||l.price<=max)&&(!fAm.value||am.indexOf(fAm.value)>=0);
+  });
+  document.getElementById("count").textContent=list.length+" place"+(list.length===1?"":"s")+" found";
+  document.getElementById("grid").innerHTML=list.map(function(l){
+    var tel=String(l.phone||"").replace(/[^0-9+]/g,"");
+    return '<div class="card"><div class="pic">🏠</div><div class="body"><strong>'+esc(l.title)+'</strong>'
+      +'<span class="small">📍 '+esc(l.area)+', Dumaguete</span>'
+      +'<span class="price">₱'+Number(l.price).toLocaleString()+' / month</span>'
+      +'<span class="small">'+esc(l.description)+'</span>'
+      +'<div class="tags">'+(l.amenities||[]).map(function(a){return '<span class="tag">'+esc(a)+"</span>"}).join("")+'</div>'
+      +'<a href="tel:'+tel+'" style="margin-top:auto"><button style="width:100%" type="button">📞 Contact owner: '+esc(l.phone)+"</button></a></div></div>";
+  }).join("")||'<p class="small">No boarding houses yet. Be the first to post one above!</p>';
+}
+
+function load(){
+  fetch(API+"?select=*&order=created_at.desc",{headers:HEAD})
+    .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
+    .then(function(rows){ data=rows; refreshAreas(); render(); })
+    .catch(function(e){
+      document.getElementById("count").textContent="Could not load listings ("+e.message+"). Please try again later.";
+    });
+}
+
+[fArea,fPrice,fAm].forEach(function(e){e.addEventListener("input",render)});
+document.getElementById("reset").onclick=function(){fArea.value="";fPrice.value="";fAm.value="";render()};
+
+document.getElementById("form").addEventListener("submit",function(ev){
+  ev.preventDefault();
+  var f=ev.target, d=new FormData(f), am=[], btn=document.getElementById("submitBtn"), msg=document.getElementById("msg");
+  f.querySelectorAll("#amChecks input:checked").forEach(function(c){am.push(c.value)});
+  var row={title:d.get("title").trim(),area:d.get("area").trim(),price:Math.round(Number(d.get("price"))),description:d.get("desc").trim(),phone:d.get("phone").trim(),amenities:am};
+  btn.disabled=true; msg.textContent="Posting...";
+  fetch(API,{method:"POST",headers:Object.assign({"Prefer":"return=minimal"},HEAD),body:JSON.stringify(row)})
+    .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); })
+    .then(function(){ f.reset(); msg.textContent="Posted! Thank you."; load(); })
+    .catch(function(e){ msg.textContent="Could not post ("+e.message+"). Please try again."; })
+    .then(function(){ btn.disabled=false; });
+});
+
+load();
+</script>
+</body>
+</html>
