@@ -178,6 +178,38 @@ function load(){
 
 [fArea,fPrice,fAm].forEach(function(e){e.addEventListener("input",render)});
 document.getElementById("reset").onclick=function(){fArea.value="";fPrice.value="";fAm.value="";render()};
+  var listingMap;
+var listingMarker;
+
+document.querySelector("#form").closest("details").addEventListener("toggle", function() {
+  if (!this.open) return;
+
+  if (!listingMap) {
+    listingMap = L.map("listingMap").setView([9.3077, 123.3054], 13);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(listingMap);
+
+    listingMap.on("click", function(e) {
+      var lat = e.latlng.lat;
+      var lng = e.latlng.lng;
+
+      if (listingMarker) {
+        listingMarker.setLatLng(e.latlng);
+      } else {
+        listingMarker = L.marker(e.latlng).addTo(listingMap);
+      }
+
+      document.getElementById("listingLatitude").value = lat;
+      document.getElementById("listingLongitude").value = lng;
+    });
+  }
+
+  setTimeout(function() {
+    listingMap.invalidateSize();
+  }, 100);
+});
 
 document.getElementById("form").addEventListener("submit",function(ev){
   ev.preventDefault();
