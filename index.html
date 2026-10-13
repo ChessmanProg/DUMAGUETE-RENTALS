@@ -63,6 +63,11 @@ form{display:grid;gap:10px;margin-top:12px}
 <label>Area<input name="area" required maxlength="40" placeholder="e.g. Daro"></label>
 <label>Price per month (₱)<input name="price" type="number" min="0" required></label>
 </div>
+<label>Pin the exact location</label>
+<p class="small">Click the map to mark where your boarding house is located.</p>
+<div id="listingMap" style="height:300px;width:100%;border-radius:12px;margin:10px 0;background:#e5e7eb;"></div>
+<input type="hidden" name="latitude" id="listingLatitude">
+<input type="hidden" name="longitude" id="listingLongitude">
 <label>Description<textarea name="desc" rows="2" maxlength="200"></textarea></label>
 <label>Contact number<input name="phone" required maxlength="20" placeholder="09xx xxx xxxx"></label>
 <div class="checks" id="amChecks"></div>
