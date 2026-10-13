@@ -313,7 +313,9 @@ var row = {
   longitude: Number(longitude)
 };
   btn.disabled=true; msg.textContent="Posting...";
-  fetch(API,{method:"POST",headers:Object.assign({"Prefer":"return=minimal"},HEAD),body:JSON.stringify(row)})
+  
+supabaseClient.from("listings").insert(row)
+
     .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); })
     .then(function(){ f.reset(); msg.textContent="Posted! Thank you."; load(); })
     .catch(function(e){ msg.textContent="Could not post ("+e.message+"). Please try again."; })
