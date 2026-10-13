@@ -98,7 +98,8 @@ var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 
 var AMENITIES = ["WiFi","Water included","Electricity included","Aircon","Own CR","Kitchen access"];
-var data = [];
+var data = [];  
+var currentOwnerId = null;
 
 function esc(s){var d=document.createElement("div");d.textContent=s==null?"":String(s);return d.innerHTML}
 var fArea=document.getElementById("fArea"), fPrice=document.getElementById("fPrice"), fAm=document.getElementById("fAm");
@@ -150,7 +151,7 @@ document.getElementById("form").addEventListener("submit",function(ev){
   ev.preventDefault();
   var f=ev.target, d=new FormData(f), am=[], btn=document.getElementById("submitBtn"), msg=document.getElementById("msg");
   f.querySelectorAll("#amChecks input:checked").forEach(function(c){am.push(c.value)});
-  var row={title:d.get("title").trim(),area:d.get("area").trim(),price:Math.round(Number(d.get("price"))),description:d.get("desc").trim(),phone:d.get("phone").trim(),amenities:am};
+var row={title:d.get("title").trim(),area:d.get("area").trim(),price:Math.round(Number(d.get("price"))),description:d.get("desc").trim(),phone:d.get("phone").trim(),amenities:am,owner_id:currentOwnerId};
   btn.disabled=true; msg.textContent="Posting...";
   fetch(API,{method:"POST",headers:Object.assign({"Prefer":"return=minimal"},HEAD),body:JSON.stringify(row)})
     .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); })
@@ -165,6 +166,7 @@ var logoutBtn = document.getElementById("logoutBtn");
 var ownerStatus = document.getElementById("ownerStatus");
 
 async function showOwnerSession(session) {
+currentOwnerId = session && session.user ? session.user.id : null;
   if (!session || !session.user) {
     ownerStatus.textContent = "Not signed in.";
     loginBtn.hidden = false;
