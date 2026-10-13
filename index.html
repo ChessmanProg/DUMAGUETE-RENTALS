@@ -280,7 +280,8 @@ var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 
 var AMENITIES = ["WiFi","Water included","Electricity included","Aircon","Own CR","Kitchen access"];
-var data = [];  
+var data = [];
+var currentModalListingId = null;
 var currentOwnerId = null;
   var currentOwnerApproved = false;
 
@@ -368,8 +369,12 @@ function openListingModal(listingId) {
     '</div>' +
     '<p>📞 ' + esc(listing.phone || "No contact number provided.") + '</p>';
 
-  document.getElementById("commentsList").innerHTML =
-    '<p class="small">Comments will be added in a later step.</p>';
+
+currentModalListingId = listing.id;
+loadListingComments();
+document.getElementById("commentStatus").textContent = "";
+document.getElementById("commentForm").reset();
+
 
   document.getElementById("listingModal").style.display = "flex";
 }
