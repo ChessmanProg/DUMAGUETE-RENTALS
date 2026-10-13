@@ -379,6 +379,78 @@ document.getElementById("commentForm").reset();
   document.getElementById("listingModal").style.display = "flex";
 }
 
+function loadListingComments() {
+  var list = document.getElementById("commentsList");
+
+  list.innerHTML = '<p class="small">Loading comments...</p>';
+
+  supabaseClient
+    .from("listing_comments")
+    .select("*")
+    .eq("listing_id", currentModalListingId)
+    .order("created_at", { ascending: false })
+    .then(function(result) {
+      if (result.error) throw result.error;
+
+      if (!result.data.length) {
+        list.innerHTML = '<p class="small">No comments yet. Ask the first question!</p>';
+        return;
+      }
+
+      list.innerHTML = result.data.map(function(c) {
+        return '<div style="padding:10px 0;border-bottom:1px solid var(--line)">' +
+          '<strong>' + esc(c.commenter_name) + '</strong>' +
+          '<p>' + esc(c.comment_text) + '</p>' +
+          '<span class="small">' + new Date(c.created_at).toLocaleString() + '</span>' +
+          '</div>';
+      }).join("");
+    })
+    .catch(function(error) {
+      list.innerHTML = '<p class="small">Could not load comments. Please try again.';
+      list.innerHTML += '</p>';
+      console.error("Comment loading error:", error);
+    });
+}
+
+document.getElementById("commentForm").addEventListener("submit", function(event) {
+  event.preventDefault();
+
+  var name = document.getElementById("commenterName").value.trim();
+  var comment = document.getElementById("commentText").value.trim();
+  var status = document.getElementById("commentStatus");
+  var button = document.getElementById("commentSubmitBtn");
+
+  if (!currentModalListingId || !name || !comment) {
+    status.textContent = "Please enter your name and question.";
+    return;
+  }
+
+  button.disabled = true;
+  status.textContent = "Posting your comment...";
+
+  supabaseClient
+    .from("listing_comments")
+    .insert({
+      listing_id: currentModalListingId,
+      commenter_name: name,
+      comment_text: comment
+    })
+    .then(function(result) {
+      if (result.error) throw result.error;
+
+      document.getElementById("commentForm").reset();
+      status.textContent = "Comment posted!";
+      loadListingComments();
+    })
+    .catch(function(error) {
+      status.textContent = "Could not post your comment. Please try again.";
+      console.error("Comment posting error:", error);
+    })
+    .then(function() {
+      button.disabled = false;
+    });
+});
+
 function closeListingModal() {
   document.getElementById("listingModal").style.display = "none";
 }
