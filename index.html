@@ -85,6 +85,23 @@ form{display:grid;gap:10px;margin-top:12px}
 </form>
 </details>
 
+<details id="photoUploadSection">
+  <summary>📷 Upload boarding-house photos</summary>
+  <p class="small">Sign in with an approved owner account to upload photos for your listing.</p>
+  <form id="photoForm">
+    <label>Choose your boarding house
+      <select id="photoListing" required>
+        <option value="">Select a listing</option>
+      </select>
+    </label>
+    <label>Select a photo
+      <input id="photoFile" type="file" accept="image/jpeg,image/png,image/webp" required>
+    </label>
+    <p class="small">Accepted formats: JPG, PNG, or WebP. Choose one photo at a time.</p>
+    <button type="submit" id="photoUploadBtn">Upload photo</button>
+    <p class="small" id="photoStatus">Please sign in first.</p>
+  </form>
+</details>
 <div id="count" class="small">Loading...</div>
 <div class="grid" id="grid"></div>
 </main>
