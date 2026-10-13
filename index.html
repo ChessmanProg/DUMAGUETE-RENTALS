@@ -215,7 +215,25 @@ document.getElementById("form").addEventListener("submit",function(ev){
   ev.preventDefault();
   var f=ev.target, d=new FormData(f), am=[], btn=document.getElementById("submitBtn"), msg=document.getElementById("msg");
   f.querySelectorAll("#amChecks input:checked").forEach(function(c){am.push(c.value)});
-var row={title:d.get("title").trim(),area:d.get("area").trim(),price:Math.round(Number(d.get("price"))),description:d.get("desc").trim(),phone:d.get("phone").trim(),amenities:am,owner_id:currentOwnerId};
+var latitude = d.get("latitude");
+var longitude = d.get("longitude");
+
+if (!latitude || !longitude) {
+  msg.textContent = "Please click the map to pin the exact location first.";
+  return;
+}
+
+var row = {
+  title: d.get("title").trim(),
+  area: d.get("area").trim(),
+  price: Math.round(Number(d.get("price"))),
+  description: d.get("desc").trim(),
+  phone: d.get("phone").trim(),
+  amenities: am,
+  owner_id: currentOwnerId,
+  latitude: Number(latitude),
+  longitude: Number(longitude)
+};
   btn.disabled=true; msg.textContent="Posting...";
   fetch(API,{method:"POST",headers:Object.assign({"Prefer":"return=minimal"},HEAD),body:JSON.stringify(row)})
     .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); })
