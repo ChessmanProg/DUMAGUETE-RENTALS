@@ -308,6 +308,100 @@ supabaseClient.auth.getSession().then(async function(result) {
   await showOwnerSession(result.data.session);
 });
 
+  
+document.getElementById("photoForm").addEventListener("submit", async function(event) {
+  event.preventDefault();
+
+  var status = document.getElementById("photoStatus");
+  var button = document.getElementById("photoUploadBtn");
+  var listingId = document.getElementById("photoListing").value;
+  var file = document.getElementById("photoFile").files[0];
+
+  if (!currentOwnerId || !currentOwnerApproved) {
+    status.textContent = "Please sign in with an approved owner account.";
+    return;
+  }
+
+  if (!listingId || !file) {
+    status.textContent = "Please select your listing and a photo.";
+    return;
+  }
+
+  if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+    status.textContent = "Please choose a JPG, PNG, or WebP image.";
+    return;
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    status.textContent = "Please choose an image smaller than 5 MB.";
+    return;
+  }
+
+  button.disabled = true;
+  status.textContent = "Uploading photo...";
+
+  var uploadedPath = null;
+
+  try {
+    var listingResult = await supabaseClient
+      .from("listings")
+      .select("photo_urls")
+      .eq("id", listingId)
+      .eq("owner_id", currentOwnerId)
+      .maybeSingle();
+
+    if (listingResult.error) throw listingResult.error;
+    if (!listingResult.data) {
+      throw new Error("Listing not found or does not belong to you.");
+    }
+
+    var safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+    var path = currentOwnerId + "/" + Date.now() + "-" + safeName;
+
+    var uploadResult = await supabaseClient
+      .storage
+      .from("boarding-house-photos")
+      .upload(path, file, {
+        upsert: false,
+        contentType: file.type
+      });
+
+    if (uploadResult.error) throw uploadResult.error;
+    uploadedPath = path;
+
+    var publicUrl = supabaseClient
+      .storage
+      .from("boarding-house-photos")
+      .getPublicUrl(path).data.publicUrl;
+
+    var photos = Array.isArray(listingResult.data.photo_urls)
+      ? listingResult.data.photo_urls
+      : [];
+
+    var updateResult = await supabaseClient
+      .from("listings")
+      .update({ photo_urls: photos.concat([publicUrl]) })
+      .eq("id", listingId)
+      .eq("owner_id", currentOwnerId)
+      .select("id");
+
+    if (updateResult.error) throw updateResult.error;
+    if (!updateResult.data || !updateResult.data.length) {
+      throw new Error("The listing could not be updated.");
+    }
+
+    document.getElementById("photoForm").reset();
+    status.textContent = "Photo uploaded successfully!";
+    load();
+  } catch (error) {
+    console.error("Photo upload failed:", error);
+    status.textContent =
+      "Upload failed: " + (error.message || "Please try again.");
+  } finally {
+    button.disabled = false;
+  }
+});
+
 load();
   
 if ("serviceWorker" in navigator) {
