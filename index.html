@@ -140,6 +140,25 @@ document.getElementById("form").addEventListener("submit",function(ev){
 });
 
 load();
+  
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("./service-worker.js")
+      .then(function (registration) {
+        console.log(
+          "App service worker registered:",
+          registration.scope
+        );
+      })
+      .catch(function (error) {
+        console.error(
+          "Service worker registration failed:",
+          error
+        );
+      });
+  });
+}
+
 </script>
 </body>
 </html>
