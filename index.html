@@ -145,7 +145,41 @@ function refreshAreas(){
   fArea.innerHTML='<option value="">All areas</option>'+areas.map(function(a){return "<option>"+esc(a)+"</option>"}).join("");
   fArea.value=cur;
 }
+var publicMapInstance;
+var publicMarkers;
 
+function renderPublicMap(list) {
+  if (!publicMapInstance) {
+    publicMapInstance = L.map("publicMap").setView([9.3077, 123.3054], 13);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(publicMapInstance);
+
+    publicMarkers = L.layerGroup().addTo(publicMapInstance);
+  }
+
+  publicMarkers.clearLayers();
+
+  list.forEach(function(l) {
+    if (l.latitude == null || l.longitude == null) return;
+
+    var lat = Number(l.latitude);
+    var lng = Number(l.longitude);
+
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+    L.marker([lat, lng])
+      .bindPopup(
+        "<strong>" + esc(l.title) + "</strong><br>" +
+        esc(l.area) + "<br>₱" +
+        Number(l.price).toLocaleString() + " / month"
+      )
+      .addTo(publicMarkers);
+  });
+
+  publicMapInstance.invalidateSize();
+}
 function render(){
   var max=parseFloat(fPrice.value);
   var list=data.filter(function(l){
@@ -153,6 +187,7 @@ function render(){
     return (!fArea.value||l.area===fArea.value)&&(isNaN(max)||l.price<=max)&&(!fAm.value||am.indexOf(fAm.value)>=0);
   });
   document.getElementById("count").textContent=list.length+" place"+(list.length===1?"":"s")+" found";
+  renderPublicMap(list);
   document.getElementById("grid").innerHTML=list.map(function(l){
     var tel=String(l.phone||"").replace(/[^0-9+]/g,"");
     
