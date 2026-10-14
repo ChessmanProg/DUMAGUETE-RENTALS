@@ -999,7 +999,16 @@ var matchesSearch = !query ||
     .some(function(value) {
       return String(value || "").toLowerCase().includes(query);
     });
-    list.sort(function(a, b) {
+
+});
+
+return matchesSearch &&
+  (!fArea.value || l.area === fArea.value) &&
+  (isNaN(max) || l.price <= max) &&
+  (!fAm.value || am.indexOf(fAm.value) >= 0);
+
+  });
+  list.sort(function(a, b) {
   if (sortBy.value === "price-low") {
     return Number(a.price) - Number(b.price);
   }
@@ -1010,13 +1019,6 @@ var matchesSearch = !query ||
 
   return new Date(b.created_at) - new Date(a.created_at);
 });
-
-return matchesSearch &&
-  (!fArea.value || l.area === fArea.value) &&
-  (isNaN(max) || l.price <= max) &&
-  (!fAm.value || am.indexOf(fAm.value) >= 0);
-
-  });
   document.getElementById("count").textContent=list.length+" place"+(list.length===1?"":"s")+" found";
   renderPublicMap(list);
   document.getElementById("grid").innerHTML=list.map(function(l){
