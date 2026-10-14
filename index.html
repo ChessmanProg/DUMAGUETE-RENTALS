@@ -644,6 +644,15 @@ button:active:not(:disabled) {
 <label>Area<select id="fArea"><option value="">All areas</option></select></label>
 <label>Max price (₱/month)<input id="fPrice" type="number" min="0" step="100" placeholder="e.g. 4000"></label>
 <label>Must include<select id="fAm"><option value="">Anything</option></select></label>
+  
+<label>Sort by
+  <select id="sortBy">
+    <option value="newest">Newest first</option>
+    <option value="price-low">Lowest price</option>
+    <option value="price-high">Highest price</option>
+  </select>
+</label>
+
 <button class="ghost" id="reset" type="button">Reset</button>
 </div>
 
