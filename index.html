@@ -117,6 +117,14 @@ form{display:grid;gap:10px;margin-top:12px}
   margin: 6px 0;
   overflow-wrap: anywhere;
 }
+  
+.comment-date {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
 
 @keyframes commentSlideIn {
   from {
@@ -621,7 +629,9 @@ return '<div class="comment-item">' +
 
           '<strong>' + esc(c.commenter_name) + '</strong>' +
           '<p>' + esc(c.comment_text) + '</p>' +
-          '<span class="small">' + new Date(c.created_at).toLocaleString() + '</span>' +
+
+'<span class="small comment-date">' + new Date(c.created_at).toLocaleString() + '</span>' +
+
           '</div>';
       }).join("");
     })
