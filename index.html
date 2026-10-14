@@ -1047,16 +1047,18 @@ function load(){
 }
 
 
-[fArea, fPrice, fAm, searchInput].forEach(function(element) {
+[fArea, fPrice, fAm, searchInput, sortBy].forEach(function(element) {
   element.addEventListener("input", render);
   element.addEventListener("change", render);
 });
+
 
 document.getElementById("reset").onclick = function() {
   fArea.value = "";
   fPrice.value = "";
   fAm.value = "";
   searchInput.value = "";
+  sortBy.value = "newest";
   render();
 };
 
