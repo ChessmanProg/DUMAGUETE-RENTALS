@@ -108,6 +108,16 @@ form{display:grid;gap:10px;margin-top:12px}
   margin: 10px 0;
   animation: commentSlideIn 0.35s ease both;
 }
+  
+.comment-item {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.comment-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(15, 118, 110, 0.1);
+}
+
 
 .comment-item strong {
   color: var(--accent);
