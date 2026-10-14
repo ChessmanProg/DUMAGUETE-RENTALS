@@ -803,7 +803,9 @@ var currentOwnerId = null;
   var currentOwnerApproved = false;
 
 function esc(s){var d=document.createElement("div");d.textContent=s==null?"":String(s);return d.innerHTML}
-var fArea=document.getElementById("fArea"), fPrice=document.getElementById("fPrice"), fAm=document.getElementById("fAm");
+var fArea=document.getElementById("fArea"), fPrice=document.getElementById("fPrice"), fAm=document.getElementById("fAm");  
+var searchInput = document.getElementById("searchInput");
+
 
 AMENITIES.forEach(function(a){
   fAm.insertAdjacentHTML("beforeend","<option>"+a+"</option>");
@@ -977,10 +979,22 @@ function closeListingModal() {
 }
 
 function render(){
-  var max=parseFloat(fPrice.value);
+var max = parseFloat(fPrice.value);
+var query = searchInput.value.trim().toLowerCase();
   var list=data.filter(function(l){
     var am=l.amenities||[];
-    return (!fArea.value||l.area===fArea.value)&&(isNaN(max)||l.price<=max)&&(!fAm.value||am.indexOf(fAm.value)>=0);
+
+var matchesSearch = !query ||
+  [l.title, l.area, l.description]
+    .some(function(value) {
+      return String(value || "").toLowerCase().includes(query);
+    });
+
+return matchesSearch &&
+  (!fArea.value || l.area === fArea.value) &&
+  (isNaN(max) || l.price <= max) &&
+  (!fAm.value || am.indexOf(fAm.value) >= 0);
+
   });
   document.getElementById("count").textContent=list.length+" place"+(list.length===1?"":"s")+" found";
   renderPublicMap(list);
@@ -1011,8 +1025,20 @@ function load(){
     });
 }
 
-[fArea,fPrice,fAm].forEach(function(e){e.addEventListener("input",render)});
-document.getElementById("reset").onclick=function(){fArea.value="";fPrice.value="";fAm.value="";render()};
+
+[fArea, fPrice, fAm, searchInput].forEach(function(element) {
+  element.addEventListener("input", render);
+  element.addEventListener("change", render);
+});
+
+document.getElementById("reset").onclick = function() {
+  fArea.value = "";
+  fPrice.value = "";
+  fAm.value = "";
+  searchInput.value = "";
+  render();
+};
+
   var listingMap;
 var listingMarker;
 
