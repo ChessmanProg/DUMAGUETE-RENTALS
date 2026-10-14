@@ -147,6 +147,27 @@ form{display:grid;gap:10px;margin-top:12px}
 }
 
 
+#commentForm input,
+#commentForm textarea {
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#commentForm input:focus,
+#commentForm textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+}
+
+
+
 #commentSubmitBtn {
   justify-self: start;
   min-width: 150px;
