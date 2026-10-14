@@ -546,6 +546,69 @@ button:active:not(:disabled) {
     padding: 16px;
   }
 }
+
+/* Modern search panel */
+.search-panel {
+  margin: 28px 0 18px;
+  padding: 22px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+}
+
+.search-panel label {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--text);
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.search-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.search-input-wrap span {
+  color: #0f766e;
+  font-size: 1.7rem;
+}
+
+.search-input-wrap input {
+  width: 100%;
+  min-width: 0;
+  padding: 15px 0;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+}
+
+.search-input-wrap:focus-within {
+  border-color: #0d9488;
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12);
+}
+
+.search-panel p {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+@media (max-width: 600px) {
+  .search-panel {
+    margin: 18px 0 14px;
+    padding: 16px;
+  }
+}
+
 </style> 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -564,6 +627,19 @@ button:active:not(:disabled) {
 </header>
 
 <main>
+  
+<div class="search-panel">
+  <label for="searchInput">Find your next place</label>
+  <div class="search-input-wrap">
+    <span>⌕</span>
+    <input
+      type="search"
+      id="searchInput"
+      placeholder="Search by boarding house or location..."
+    >
+  </div>
+  <p>Find a room that fits your budget and lifestyle.</p>
+</div>
 <div class="bar">
 <label>Area<select id="fArea"><option value="">All areas</option></select></label>
 <label>Max price (₱/month)<input id="fPrice" type="number" min="0" step="100" placeholder="e.g. 4000"></label>
