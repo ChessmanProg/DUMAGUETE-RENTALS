@@ -36,7 +36,85 @@ form{display:grid;gap:10px;margin-top:12px}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .checks{display:flex;flex-wrap:wrap;gap:12px}
 .checks label{flex-direction:row;align-items:center;color:var(--text);font-size:.9rem}
-  
+  /* Homepage hero redesign */
+header.hero {
+  max-width: none;
+  margin: 0;
+  padding: 64px 24px 60px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #064e46 0%, #0f766e 55%, #14b8a6 100%);
+  overflow: hidden;
+}
+
+.hero-content {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.hero-badge {
+  display: inline-block;
+  padding: 7px 12px;
+  margin-bottom: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+
+.hero h1 {
+  max-width: 720px;
+  margin: 0 0 16px;
+  font-size: clamp(2.4rem, 6vw, 4.5rem);
+  line-height: 1.08;
+  letter-spacing: -1.5px;
+}
+
+.hero h1 span {
+  color: #99f6e4;
+}
+
+.hero p {
+  max-width: 580px;
+  margin: 0 0 26px;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 1.1rem;
+  line-height: 1.7;
+}
+
+.hero-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 19px;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #065f56;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hero-link:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+}
+
+@media (max-width: 600px) {
+  header.hero {
+    padding: 46px 20px 42px;
+  }
+
+  .hero h1 {
+    letter-spacing: -0.8px;
+  }
+
+  .hero p {
+    font-size: 1rem;
+  }
+}
 .listing-modal {
   position: fixed;
   inset: 0;
