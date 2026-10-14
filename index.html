@@ -994,11 +994,18 @@ var query = searchInput.value.trim().toLowerCase();
   var list=data.filter(function(l){
     var am=l.amenities||[];
 
-var matchesSearch = !query ||
-  [l.title, l.area, l.description]
-    .some(function(value) {
-      return String(value || "").toLowerCase().includes(query);
-    });
+
+    var matchesSearch = !query ||
+      [l.title, l.area, l.description]
+        .some(function(value) {
+          return String(value || "").toLowerCase().includes(query);
+        });
+
+    return matchesSearch &&
+      (!fArea.value || l.area === fArea.value) &&
+      (isNaN(max) || l.price <= max) &&
+      (!fAm.value || am.indexOf(fAm.value) >= 0);
+  });
 
 });
 
