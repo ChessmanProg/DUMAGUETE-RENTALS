@@ -1006,9 +1006,7 @@ var query = searchInput.value.trim().toLowerCase();
       (isNaN(max) || l.price <= max) &&
       (!fAm.value || am.indexOf(fAm.value) >= 0);
   });
-
-});
-
+  
   list.sort(function(a, b) {
   if (sortBy.value === "price-low") {
     return Number(a.price) - Number(b.price);
