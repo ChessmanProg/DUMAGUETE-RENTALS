@@ -561,7 +561,9 @@ function loadListingComments() {
       }
 
       list.innerHTML = result.data.map(function(c) {
-        return '<div style="padding:10px 0;border-bottom:1px solid var(--line)">' +
+
+return '<div class="comment-item">' +
+
           '<strong>' + esc(c.commenter_name) + '</strong>' +
           '<p>' + esc(c.comment_text) + '</p>' +
           '<span class="small">' + new Date(c.created_at).toLocaleString() + '</span>' +
