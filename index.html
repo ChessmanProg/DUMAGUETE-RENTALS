@@ -812,7 +812,8 @@ var currentOwnerId = null;
   var currentOwnerApproved = false;
 
 function esc(s){var d=document.createElement("div");d.textContent=s==null?"":String(s);return d.innerHTML}
-var fArea=document.getElementById("fArea"), fPrice=document.getElementById("fPrice"), fAm=document.getElementById("fAm");  
+var fArea=document.getElementById("fArea"), fPrice=document.getElementById("fPrice"), fAm=document.getElementById("fAm");
+var sortBy = document.getElementById("sortBy");
 var searchInput = document.getElementById("searchInput");
 
 
@@ -998,6 +999,17 @@ var matchesSearch = !query ||
     .some(function(value) {
       return String(value || "").toLowerCase().includes(query);
     });
+    list.sort(function(a, b) {
+  if (sortBy.value === "price-low") {
+    return Number(a.price) - Number(b.price);
+  }
+
+  if (sortBy.value === "price-high") {
+    return Number(b.price) - Number(a.price);
+  }
+
+  return new Date(b.created_at) - new Date(a.created_at);
+});
 
 return matchesSearch &&
   (!fArea.value || l.area === fArea.value) &&
